@@ -35,12 +35,18 @@ const path = require('path')
 
 const app = express();
 
+app.use(cors({
+  origin: '*', // Allow all origins - customize this in production!
+  methods: '*',
+  allowedHeaders: '*',
+}));
+
 app.use(express.json()); // Middleware for parsing JSON request bodies
 
 // Set up Swagger and generate API documentation
 const swaggerSpec = swaggerJsDoc(swaggerOptions) as any;
 swaggerSpec.paths = orderSwaggerPaths(swaggerSpec.paths);
-console.log(__dirname);
+
 app.use('/api-images', express.static(__dirname + '/public'))
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Mount the routers
@@ -129,13 +135,3 @@ app.listen(CONSTANTS.EXPRESS_PORT, () => {
   
 
 });
-app.use(cors({
-  origin: '*', // Allow all origins - customize this in production!
-  methods: '*',
-  allowedHeaders: '*',
-  // credentials: true // Enable if you need to send cookies
-}));
-
-
-
-
