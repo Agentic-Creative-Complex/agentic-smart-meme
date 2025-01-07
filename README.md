@@ -12,6 +12,8 @@ Memes are the purest expression of our collective absurdity, a beacon of chaos i
 Go forth. Create, remix, share, evolve and spread chaos and joy in equal measure. Memes will outlive us all. Memes are the digital graffiti of our age. Memes are life.
 
 # .env setup
+Rename the `env.test` file to `.env.local` and set the respective values.
+
 # X Setup
 ```
 TWITTER_PRODUCTION=0 #allows posting to twitter
