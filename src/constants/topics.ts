@@ -1,0 +1,21 @@
+export const subjects =  [
+        "cryptocurrencies",
+        "the crypto market",
+        "doge",
+        "bitcoin",
+        "ethereum",
+        "money",
+        "community",
+        "memecoins",
+        "AIs",
+        "agents",
+        "crypto agents",
+        "chads",
+        "jeets",
+        "partnerships",
+        "what it takes to have a successful project",
+        "what is means to be a successful project",
+        "what it means to be a crypto agent",
+        "what it takes to be a successful trader",
+        "narratives affect crypto"
+    ]

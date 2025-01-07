@@ -1,0 +1,42 @@
+# docker-compose.yml
+services:
+  app:
+    restart: on-failure
+    build: .
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://user:pass@postgres:5432/db
+      NODE_ENV: local
+    ports:
+      - "3006:3000" # For accessing the app
+      - "9234:9233" # For debugging
+    command: npm run dev
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - shared_meme_net
+      - meme_net
+
+  postgres:
+    image: postgres:11
+    ports:
+      - "35436:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data/:rw
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: db
+      PGDATA: /var/lib/postgresql/data/
+    networks:
+      - meme_net
+      - shared_meme_net
+
+# External networks for communicating with meme workers and other services
+networks:
+  shared_meme_net:
+    external: false
+  meme_net:
+    external: false
