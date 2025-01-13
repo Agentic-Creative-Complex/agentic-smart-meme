@@ -63,7 +63,7 @@ git clone https://github.com/Agentic-Creative-Complex/agentic-smart-meme.git
 docker-compose up
 ```
 
-# Collaborations 🤝
+# Collaboration 🤝
 
 # General community
 Feel free to request new features or report bugs through our [issues section](https://github.com/Agentic-Creative-Complex/agentic-smart-meme/issues)
