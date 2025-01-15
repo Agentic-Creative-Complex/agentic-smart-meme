@@ -7,24 +7,15 @@ dotenv.config();
 
 const MEDIA_ENDPOINT_URL = 'https://upload.twitter.com/1.1/media/upload.json';
 
-const CONSUMER_KEY = process.env.TWITTER_API_KEY || '';
-const CONSUMER_SECRET = process.env.TWITTER_API_SECRET_KEY || '';
-const ACCESS_TOKEN = process.env.TWITTER_ACCESS_TOKEN || '';
-const ACCESS_TOKEN_SECRET = process.env.TWITTER_ACCESS_TOKEN_SECRET || '';
+const CONSUMER_KEY = process.env.TWITTER_API_KEY!;
+const CONSUMER_SECRET = process.env.TWITTER_API_SECRET_KEY!;
+const ACCESS_TOKEN = process.env.TWITTER_ACCESS_TOKEN!;
+const ACCESS_TOKEN_SECRET = process.env.TWITTER_ACCESS_TOKEN_SECRET!;
 
 class TwitterMediaUploader {
-  /**
-   * Creates an instance of TwitterMediaUploader.
-   */
+
   constructor() {}
 
-  /**
-   * Uploads media to Twitter.
-   *
-   * @param {string} filePath - The path to the media file.
-   * @param {string} mediaCategory - The category of the media.
-   * @returns {Promise<void>} - A promise that resolves after the upload is complete.
-   */
   async uploadMedia(filePath: string, mediaCategory: string) {
 
     try {
@@ -65,11 +56,6 @@ class TwitterMediaUploader {
   }
 }
 
-/**
- * Uploads an image to Twitter.
- *
- * @returns {Promise<void>} - A promise that resolves after the upload is complete.
- */
 export async function uploadImageToTwitter(imageUrl: string) {
   try {
     const twitterUploader = new TwitterMediaUploader();

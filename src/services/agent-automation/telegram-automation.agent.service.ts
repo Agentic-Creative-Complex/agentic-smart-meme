@@ -10,7 +10,7 @@ import { Activity, ActivityChannel, ActivityType } from "../../db/models/Activit
 
 dotenv.config();
 
-const BOT_USERNAME = process.env.TG_BOT_USERNAME || '';
+const BOT_USERNAME = process.env.TG_BOT_USERNAME!;
 
 export const checkTgUpdates = async (): Promise<void> => {
     try {
@@ -29,8 +29,6 @@ export const checkTgUpdates = async (): Promise<void> => {
 
     await sleep(2000);
     await checkTgUpdates(); //recursive call to keep getting updates
-
-    return; 
 }
 
 const handleTgUpdates = async (updates: TelegramUpdate[]): Promise<void> => {

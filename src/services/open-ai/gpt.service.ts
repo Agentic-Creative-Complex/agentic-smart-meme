@@ -6,13 +6,13 @@ import axios from 'axios';
 import { User } from "../../db/models/User";
 import { gagsterPrompt } from "../../prompts/smart-meme-agent";
 
-const artAssistantId = process.env.ART_ASSISTANT_ID || '';
-const socialAssistantId = process.env.SOCIAL_ASSISTANT_ID || '';
-const artModel = 'dall-e-3';
+const artAssistantId = process.env.ART_ASSISTANT_ID!;
+const socialAssistantId = process.env.SOCIAL_ASSISTANT_ID!;
+const artModel = process.env.ART_MODEL!;
 
 // Configure OpenAI with API key
 const configuration = {
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: process.env.OPENAI_API_KEY!,
 };
 
 const ART_ASSISTANT_CONTEXT = gagsterPrompt;
@@ -59,12 +59,19 @@ export async function sendMessage (user : User | null, message: string, artGener
                     thread_id
                 );
 
+                const message = messages.data[0].content[0] as TextContentBlock;
+
+                if(!message || !message?.text){
+                    console.error({
+                        message: `Error: No message returned from Agent`,
+                    })
+                    return null;
+                }
+
                 if(user){
                     user.thread_id = thread_id;
                     await user.save();
                 }
-
-                const message = messages.data[0].content[0] as TextContentBlock;
                 
                 return message.text.value.trim();
                 
@@ -73,10 +80,11 @@ export async function sendMessage (user : User | null, message: string, artGener
                 run.status === 'cancelled' ||
                 run.status === 'expired'
             ) {
-                console.error(`Run ended with status: ${run.status}`);
-                return `Error: The run ended with status: ${run.status}`;
-            }
-             else {
+                console.error({
+                    message: `Error: The run ended with status: ${run.status}`,
+                })
+                return null;
+            } else {
                 console.log(run.status);
             }
             await sleep(500);
@@ -111,6 +119,7 @@ ${ART_ASSISTANT_CONTEXT}` ;
         return response.data[0];
     } catch (error) {
         console.error("createImage error: ", error);
+        return null;
     }
     
 }
@@ -134,7 +143,7 @@ export const download_image = async (url: string, image_path: string) =>{
                       return resolve(image_path) 
                   } )
                   .on('error', (e: any) => {
-                      console.log(e);
+                      console.error("download_image error: ", e);
                       return reject(e)
                   } );
               }),
