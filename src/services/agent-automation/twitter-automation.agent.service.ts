@@ -14,13 +14,14 @@ const MAX_REPLIES = Number(process.env.MAX_REPLIES) || 5;
 const ART_ASSISTANT_ALLOWED = process.env.ART_ASSISTANT_ALLOWED == "1";
 const PROFILE_X_ID = process.env.PROFILE_X_ID || '';
 const BACKEND_URL = process.env.BACKEND_URL || '';
+const INITIAL_X_TS = 1289001601000;
 
 export async function getAndReplyRecentMentions() {
     try {
         console.log("Checking for new mentions...");
         // Fetch recent mentions for the authenticated user
         const lastMention = await Mention.findOne({ order: [['timestamp', 'DESC']] });
-        const lastDate = lastMention ? lastMention.timestamp : 1289001601000;    
+        const lastDate = lastMention ? lastMention.timestamp : INITIAL_X_TS;    
         const mentions = await getMentions(lastDate);
 
         if(mentions.length == 0){

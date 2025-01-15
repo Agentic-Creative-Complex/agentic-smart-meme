@@ -15,6 +15,8 @@ const configuration = {
     apiKey: process.env.OPENAI_API_KEY,
 };
 
+const ART_ASSISTANT_CONTEXT = gagsterPrompt;
+
 const openai = new OpenAI(configuration);
 
 export async function sendMessage (user : User | null, message: string, artGeneration: boolean = true) {
@@ -92,44 +94,52 @@ export async function sendMessage (user : User | null, message: string, artGener
     
 }
 
-const ART_ASSISTANT_CONTEXT = gagsterPrompt;
-
 export async function createImage(prompt: string | null = null) {
-    const improvedPrompt = prompt ? 
+    try {
+        const improvedPrompt = prompt ? 
                         `Create an image that represents the thoughts of the following tweet: "${prompt}"` :
                         `Generate a random meme. You don't know how to write. You NEVER depict any kind of text in the image. This is mandatory. 
 ${ART_ASSISTANT_CONTEXT}` ;
-    const response = await openai.images.generate({
-        model: artModel,
-        prompt: improvedPrompt,
-        n: 1,
-        size: "1024x1024",
-        });
-    console.log(`image: ${JSON.stringify(response.data[0])}`);
+        const response = await openai.images.generate({
+            model: artModel,
+            prompt: improvedPrompt,
+            n: 1,
+            size: "1024x1024",
+            });
+        console.log(`image: ${JSON.stringify(response.data[0])}`);
+        
+        return response.data[0];
+    } catch (error) {
+        console.error("createImage error: ", error);
+    }
     
-    return response.data[0];
 }
 
 /* ============================================================
   Function: Download Image
 ============================================================ */
 
-export const download_image = async (url: string, image_path: string) =>
-    await axios({
-      url,
-      responseType: 'stream',
-    }).then(
-      (response : any) =>
-        new Promise((resolve, reject) => {
-          response.data
-            .pipe(fs.createWriteStream(image_path))
-            .on('finish', () : any => { 
-                console.log("Image saved: ", image_path);    
-                return resolve(image_path) 
-            } )
-            .on('error', (e: any) => {
-                console.log(e);
-                return reject(e)
-            } );
-        }),
-    );
+export const download_image = async (url: string, image_path: string) =>{
+    try {
+        await axios({
+            url,
+            responseType: 'stream',
+          }).then(
+            (response : any) =>
+              new Promise((resolve, reject) => {
+                response.data
+                  .pipe(fs.createWriteStream(image_path))
+                  .on('finish', () : any => { 
+                      console.log("Image saved: ", image_path);    
+                      return resolve(image_path) 
+                  } )
+                  .on('error', (e: any) => {
+                      console.log(e);
+                      return reject(e)
+                  } );
+              }),
+          );
+    } catch (error) {
+        console.error("download_image error: ", error);
+    }
+}

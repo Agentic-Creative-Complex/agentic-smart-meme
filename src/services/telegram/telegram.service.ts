@@ -15,6 +15,11 @@ const CHAT_ID = process.env.TG_CHAT_ID || '';
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
 export async function postOnTgChannels(message: string, image: string | null = null, chatId = CHAT_ID): Promise<void> {
+    if (!TG_ALLOWED) {
+      console.log('Telegram is not allowed');
+      return;
+    }
+
     try {
       const chats = await TgChat.findAll({ where: { enabled: true } });
 
@@ -24,10 +29,7 @@ export async function postOnTgChannels(message: string, image: string | null = n
     } catch (error) {
         console.error('Error sending TG messages:', error);
     }
-    if (!TG_ALLOWED) {
-        console.log('Telegram is not allowed');
-        return;
-    }
+    
    
 }
  
@@ -99,29 +101,36 @@ export const replyToMessage = async (chatId: number, messageId: number, text: st
 
 
 export const categorizeMessage = (originalMessage?: TelegramMessage): string => {
-  if (!originalMessage) return 'UNKNOWN';
+  try {
+    if (!originalMessage) return 'UNKNOWN';
 
-  if (originalMessage.text && originalMessage.text.includes(BOT_USERNAME)) {
-    return 'MENTION';
+    if (originalMessage.text && originalMessage.text.includes(BOT_USERNAME)) {
+      return 'MENTION';
+    }
+
+    if (originalMessage.reply_to_message && originalMessage.reply_to_message.from?.username === BOT_USERNAME) {
+      return 'REPLY';
+    }
+
+    if (originalMessage.new_chat_participant || originalMessage.new_chat_member) {
+      return 'NEW_USER';
+    }
+
+    if(originalMessage.left_chat_member){
+      return 'USER_LEFT';
+    }
+
+    if(originalMessage.chat.type === 'private'){
+      return 'PRIVATE';
+    }
+
+    return 'OTHER';
+  } catch (error) {
+    console.error('Error categorizing message:', error);
+    return 'UNKNOWN';
+    
   }
-
-  if (originalMessage.reply_to_message && originalMessage.reply_to_message.from?.username === BOT_USERNAME) {
-    return 'REPLY';
-  }
-
-  if (originalMessage.new_chat_participant || originalMessage.new_chat_member) {
-    return 'NEW_USER';
-  }
-
-  if(originalMessage.left_chat_member){
-    return 'USER_LEFT';
-  }
-
-  if(originalMessage.chat.type === 'private'){
-    return 'PRIVATE';
-  }
-
-  return 'OTHER';
+  
 };
 
 

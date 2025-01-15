@@ -88,7 +88,6 @@ export const actionsRouter = Router();
 actionsRouter.post('/tweet', async (req: Request, res: Response) => {
   // get request body
   const message  = req.body.message;
-  return res.status(BAD_REQUEST_400).json({ status: BAD_REQUEST_400, message: 'Bad request body' }); 
   try {
 
     if(!req.body || !req.body.message){
@@ -360,7 +359,7 @@ actionsRouter.post('/generate', async (req: Request, res: Response) => {
   const message  = req.body.prompt;
 
   try {
-    return res.status(BAD_REQUEST_400).json({ status: BAD_REQUEST_400, message: 'Bad request body' }); 
+
     if(!req.body || !req.body.prompt){
       return res.status(BAD_REQUEST_400).json({ status: BAD_REQUEST_400, message: 'Bad request body' }); 
     }

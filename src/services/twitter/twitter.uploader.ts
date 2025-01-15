@@ -26,39 +26,41 @@ class TwitterMediaUploader {
    * @returns {Promise<void>} - A promise that resolves after the upload is complete.
    */
   async uploadMedia(filePath: string, mediaCategory: string) {
-    const fileData = fs.readFileSync(filePath, { encoding: 'base64' });
-    const formData = new FormData();
-    formData.append('media_data', fileData);
-    formData.append('media_category', mediaCategory);
-    const oauth = new OAuth({
-      consumer: {
-        key: CONSUMER_KEY,
-        secret: CONSUMER_SECRET
-      },
-      signature_method: 'HMAC-SHA1',
-      hash_function: function (base_string: any, key: any) {
-        return crypto.createHmac('sha1', key).update(base_string).digest('base64');
-      }
-    });
-    const authHeader = oauth.toHeader(oauth.authorize({ url: MEDIA_ENDPOINT_URL, method: 'POST' }, { key: ACCESS_TOKEN, secret: ACCESS_TOKEN_SECRET }));
-
-    const requestData = {
-      url: MEDIA_ENDPOINT_URL,
-      data: formData,
-      headers: {
-        Authorization: authHeader.Authorization,
-        'Content-Type': 'multipart/form-data'
-      }
-    };
 
     try {
+
+      const fileData = fs.readFileSync(filePath, { encoding: 'base64' });
+      const formData = new FormData();
+      formData.append('media_data', fileData);
+      formData.append('media_category', mediaCategory);
+      const oauth = new OAuth({
+        consumer: {
+          key: CONSUMER_KEY,
+          secret: CONSUMER_SECRET
+        },
+        signature_method: 'HMAC-SHA1',
+        hash_function: function (base_string: any, key: any) {
+          return crypto.createHmac('sha1', key).update(base_string).digest('base64');
+        }
+      });
+      const authHeader = oauth.toHeader(oauth.authorize({ url: MEDIA_ENDPOINT_URL, method: 'POST' }, { key: ACCESS_TOKEN, secret: ACCESS_TOKEN_SECRET }));
+
+      const requestData = {
+        url: MEDIA_ENDPOINT_URL,
+        data: formData,
+        headers: {
+          Authorization: authHeader.Authorization,
+          'Content-Type': 'multipart/form-data'
+        }
+      };
+
       console.log('Uploading media');
       const response = await axios.post(requestData.url, requestData.data, { headers: requestData.headers });
       const mediaID = response.data.media_id_string;
       return mediaID;
     } catch (error) {
-      console.error(error);
-      process.exit(1);
+      console.error('uploadMedia error: ', error);
+      return null;
     }
   }
 }
@@ -69,8 +71,13 @@ class TwitterMediaUploader {
  * @returns {Promise<void>} - A promise that resolves after the upload is complete.
  */
 export async function uploadImageToTwitter(imageUrl: string) {
-  const twitterUploader = new TwitterMediaUploader();
-  const response = await twitterUploader.uploadMedia(imageUrl, 'tweet_image');
-  console.log(response);
-  return response;
+  try {
+    const twitterUploader = new TwitterMediaUploader();
+    const response = await twitterUploader.uploadMedia(imageUrl, 'tweet_image');
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.error('uploadImageToTwitter error: ',error);
+  }
+  
 }

@@ -75,16 +75,13 @@ dataRouter.get('/activity/:timestamp', async (req: Request, res: Response) => {
 
   const timestamp = Number(req.params.timestamp);
   var limit = Number(req.query.limit) || 10;
-
-  //caps the api to max 100 results
-  if (limit > 100) {
-    limit = 100;
-  } else if (isNaN(limit)) {
-    limit = 10;
-  }
-
-  try {
-
+  try {   
+      //caps the api to max 100 results
+      if (limit > 100) {
+        limit = 100;
+      } else if (isNaN(limit)) {
+        limit = 10;
+      }
       const activities = await Activity.findAll({ where: { timestamp: { [Op.gte]: timestamp }  }, limit: limit, order: [['timestamp', 'ASC']] });
 
       const lastTimestamp = activities.length > 0 ? activities[activities.length - 1].timestamp : timestamp;
@@ -181,16 +178,14 @@ dataRouter.get('/artwork/:timestamp', async (req: Request, res: Response) => {
 
   const timestamp = Number(req.params.timestamp);
   var limit = Number(req.query.limit) || 10;
-
-  //caps the api to max 100 results
-  if (limit > 100) {
-    limit = 100;
-  } else if (isNaN(limit)) {
-    limit = 10;
-  }
-
   try {
-
+    
+      //caps the api to max 100 results
+      if (limit > 100) {
+        limit = 100;
+      } else if (isNaN(limit)) {
+        limit = 10;
+      }
       const activities = await Artwork.findAll({ where: { created_at: { [Op.lte]: timestamp }  }, limit: limit, order: [['created_at', 'DESC']] });
 
       const lastTimestamp = activities.length > 0 ? activities[activities.length - 1].created_at.getTime() : timestamp;
