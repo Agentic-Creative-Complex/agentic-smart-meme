@@ -63,7 +63,8 @@ export async function uploadImageToTwitter(imageUrl: string) {
     console.log(response);
     return response;
   } catch (error) {
-    console.error('uploadImageToTwitter error: ',error);
+    console.error('uploadImageToTwitter error: ', error);
+    return null;
   }
   
 }

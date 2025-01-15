@@ -45,6 +45,7 @@ export async function sendMessage (user : User | null, message: string, artGener
             
           );
           console.log("Running thread "+ thread_id);
+          //Model is definied in the assistant configuration
           let run = await openai.beta.threads.runs.createAndPoll(
             thread_id,
             { 
@@ -104,6 +105,11 @@ export async function sendMessage (user : User | null, message: string, artGener
 
 export async function createImage(prompt: string | null = null) {
     try {
+
+        if(!artModel){
+            console.error("ERROR: Art model not defined");
+            return null;
+        }
         const improvedPrompt = prompt ? 
                         `Create an image that represents the thoughts of the following tweet: "${prompt}"` :
                         `Generate a random meme. You don't know how to write. You NEVER depict any kind of text in the image. This is mandatory. 

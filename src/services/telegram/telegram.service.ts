@@ -3,18 +3,17 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import { TgMessage } from "../../db/models/TgMessage";
 import { TgChat } from "../../db/models/TgChat";
-import { TgMessageAttributes, TelegramMessage, TelegramUpdate } from "../../types/TelegramTypes";
+import { TelegramMessage, TelegramUpdate } from "../../types/TelegramTypes";
 
 dotenv.config();
 
 const TG_ALLOWED = process.env.TG_ALLOWED == "1";
 const TG_PRODUCTION = process.env.TG_PRODUCTION == "1";
-const BOT_TOKEN = process.env.TG_BOT_TOKEN || '';
-const BOT_USERNAME = process.env.TG_BOT_USERNAME || '';
-const CHAT_ID = process.env.TG_CHAT_ID || '';
+const BOT_TOKEN = process.env.TG_BOT_TOKEN!;
+const BOT_USERNAME = process.env.TG_BOT_USERNAME!;
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
-export async function postOnTgChannels(message: string, image: string | null = null, chatId = CHAT_ID): Promise<void> {
+export async function postOnTgChannels(message: string, image: string | null = null): Promise<void> {
     if (!TG_ALLOWED) {
       console.log('Telegram is not allowed');
       return;
@@ -30,10 +29,11 @@ export async function postOnTgChannels(message: string, image: string | null = n
         console.error('Error sending TG messages:', error);
     }
     
+    return;
    
 }
  
-export async function sendTelegramMessage(message: string, image: string | null = null, chatId = CHAT_ID): Promise<void> {
+export async function sendTelegramMessage(message: string, image: string | null = null, chatId: string): Promise<void> {
   
   try {
     
@@ -52,6 +52,8 @@ export async function sendTelegramMessage(message: string, image: string | null 
   } catch (error) {
     console.error('Error sending TG message:', error);
   }
+
+  return;
     
 }
 
@@ -96,6 +98,7 @@ export const replyToMessage = async (chatId: number, messageId: number, text: st
     } catch (error) {
       console.error('Error sending message:', error);
     }
+    return;
 };
 
 

@@ -30,8 +30,6 @@ import { TgChat } from "./db/models/TgChat";
 import { TgMessage } from "./db/models/TgMessage";
 import { Activity } from "./db/models/Activity";
 import { Artwork } from "./db/models/Artwork";
-const path = require('path')
-
 
 const app = express();
 

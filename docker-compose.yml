@@ -6,7 +6,7 @@ services:
     depends_on:
       - postgres
     environment:
-      DATABASE_URL: postgres://user:pass@postgres:5432/db
+      DATABASE_URL: # eg: postgres://user:pass@postgres:5432/db
       NODE_ENV: local
     ports:
       - "3006:3000" # For accessing the app
@@ -26,9 +26,9 @@ services:
     volumes:
       - ./data:/var/lib/postgresql/data/:rw
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
-      POSTGRES_DB: db
+      POSTGRES_USER: #eg: user
+      POSTGRES_PASSWORD: #eg: pass
+      POSTGRES_DB: #eg: db
       PGDATA: /var/lib/postgresql/data/
     networks:
       - meme_net
