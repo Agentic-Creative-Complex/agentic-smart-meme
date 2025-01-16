@@ -6,9 +6,9 @@
 [![Twitter](https://img.shields.io/badge/X-Community-white)](https://x.com/GagsterAgent)
 [![Telegram](https://img.shields.io/badge/Telegram-Community-blue)](https://t.me/gagsterai)
 [![Documentation](https://img.shields.io/badge/Documentation-Official-green)](https://api.gagster.io/api-docs)
-[![Architecture](https://img.shields.io/badge/Architecture-purple)](./ARCHITECTURE)
+[![Architecture](https://img.shields.io/badge/Architecture-purple)](./ARCHITECTURE.md)
 [![License](https://img.shields.io/badge/license-GNU--3.0-blue)](./LICENSE)
-[![Contributions](https://img.shields.io/badge/Contributions-yellow)](./CONTRIBUTE)
+[![Contributions](https://img.shields.io/badge/Contributions-yellow)](./CONTRIBUTE.md)
 [![Requests](https://img.shields.io/badge/Community-Requests-red)](./REQUESTS)
 
 </div>
