@@ -12,8 +12,10 @@ const MAX_REPLIES = Number(process.env.MAX_REPLIES);
 const ART_ASSISTANT_ALLOWED = process.env.ART_ASSISTANT_ALLOWED == "1";
 const PROFILE_X_ID = process.env.PROFILE_X_ID!;
 const BACKEND_URL = process.env.BACKEND_URL!;
-const INITIAL_X_TS = 1289001601000;
+const INITIAL_X_TS = 1289001601000; //this the minimum twitter date query is 11/5/2010
+const MENTIONS_INTERVAL = 120000; //2 minutes
 
+// Fetch and reply mentions for the authenticated user
 export async function getAndReplyRecentMentions() {
     try {
         console.log("Checking for new mentions...");
@@ -24,7 +26,7 @@ export async function getAndReplyRecentMentions() {
 
         if(mentions.length == 0){
             console.log("No new mentions");
-            await sleep(120000); //sleep for 2 minutes
+            await sleep(MENTIONS_INTERVAL); //sleep for 2 minutes
             return await getAndReplyRecentMentions(); //recursive call to get more mentions
         }
         
@@ -75,6 +77,7 @@ export async function getAndReplyRecentMentions() {
                 console.log("No new users to add");
             }
         } catch (error: any) {
+            //not critical, just log the error and continue
             console.error('Error fetching new users:', error.data);
         } 
 
@@ -133,13 +136,15 @@ export async function getAndReplyRecentMentions() {
         };
         
     } catch (error) {
+        //ignore and try again on next iteration
         console.error('Error fetching mentions:', error);
     }
 
-    await sleep(120000); //sleep for 2 minutes
+    await sleep(MENTIONS_INTERVAL); //sleep for 2 minutes
     return await getAndReplyRecentMentions(); //recursive call to get more mentions
 }
 
+// Generate an art piece based on a prompt
 export async function generateArt(prompt: string | null = null){
     try {
         const answer = prompt ? await sendMessage(null, prompt, !ART_ASSISTANT_ALLOWED) : null;
@@ -171,11 +176,14 @@ export async function generateArt(prompt: string | null = null){
         
         return response;
     } catch (error) {
+        //return empty object if there is an error and let the caller handle it
         console.error(`Error generating art piece: ${error}`);
+        return {};
     }
     
 }
 
+// Generate a new art piece and post it on Twitter and Telegram
 export async function createRandomPiece() {
 
     try{
@@ -221,12 +229,14 @@ ${content.concept}`;
             await artwork.save();
         }
     } catch (error : any) {
+        //ignore and try again on next iteration
         console.error('Error tweeting:', error, error.data);
     }
 
     
 }
 
+// Generate a random message and post it on Twitter and Telegram
 export async function postRandomMessage() {
 
     try{
@@ -242,6 +252,7 @@ export async function postRandomMessage() {
             console.log(`- You shared: ${answer}`);
         }
     } catch (error : any) {
+        //ignore and try again on next iteration
         console.error('Error tweeting:', error, error.data);
     }
 

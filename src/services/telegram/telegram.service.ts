@@ -13,6 +13,7 @@ const BOT_TOKEN = process.env.TG_BOT_TOKEN!;
 const BOT_USERNAME = process.env.TG_BOT_USERNAME!;
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
+//post message to telegram all channels the bot is in
 export async function postOnTgChannels(message: string, image: string | null = null): Promise<void> {
     if (!TG_ALLOWED) {
       console.log('Telegram is not allowed');
@@ -33,6 +34,7 @@ export async function postOnTgChannels(message: string, image: string | null = n
    
 }
  
+// Function to send a message via Telegram API.
 export async function sendTelegramMessage(message: string, image: string | null = null, chatId: string): Promise<void> {
   
   try {
@@ -57,6 +59,7 @@ export async function sendTelegramMessage(message: string, image: string | null 
     
 }
 
+// Function to fetch updates from Telegram API.
 export const getUpdates = async (): Promise<TelegramUpdate[]> => {
     try {
 
@@ -102,7 +105,7 @@ export const replyToMessage = async (chatId: number, messageId: number, text: st
 };
 
 
-
+// Function to categorize a message based on its content.
 export const categorizeMessage = (originalMessage?: TelegramMessage): string => {
   try {
     if (!originalMessage) return 'UNKNOWN';

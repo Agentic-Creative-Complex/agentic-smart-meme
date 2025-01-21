@@ -9,6 +9,7 @@ import { gagsterPrompt } from "../../prompts/smart-meme-agent";
 const artAssistantId = process.env.ART_ASSISTANT_ID!;
 const socialAssistantId = process.env.SOCIAL_ASSISTANT_ID!;
 const artModel = process.env.ART_MODEL!;
+const IMAGE_SIZE = "1024x1024";
 
 // Configure OpenAI with API key
 const configuration = {
@@ -19,9 +20,13 @@ const ART_ASSISTANT_CONTEXT = gagsterPrompt;
 
 const openai = new OpenAI(configuration);
 
+/* ============================================================
+  Function: Send Message to model and get response by running 
+  a thread in the Assistant
+============================================================ */
 export async function sendMessage (user : User | null, message: string, artGeneration: boolean = true) {
-    
-    const sendingMessage : MessageCreateParams = { role: 'user', content: user?.username ? `${message} @${user.username}` : message };
+    const text = user?.username ? `${message} @${user.username}` : message;
+    const sendingMessage : MessageCreateParams = { role: 'user', content: text };
 
     // Initialize a new thread with the system message
     console.log("Sending message: [" + sendingMessage.content + "]");
@@ -66,6 +71,7 @@ export async function sendMessage (user : User | null, message: string, artGener
                     console.error({
                         message: `Error: No message returned from Agent`,
                     })
+                    //returns null if message not present and the caller defines the behavior
                     return null;
                 }
 
@@ -84,6 +90,7 @@ export async function sendMessage (user : User | null, message: string, artGener
                 console.error({
                     message: `Error: The run ended with status: ${run.status}`,
                 })
+                //returns null if there is an error and the caller defines the behavior
                 return null;
             } else {
                 console.log(run.status);
@@ -98,15 +105,20 @@ export async function sendMessage (user : User | null, message: string, artGener
             error_message: error?.message,
             error_stack: error?.stack
           })
+          //returns null if there is an error and the caller defines the behavior
           return null;
     }
     
 }
 
+/* ============================================================
+  Function: Create Image
+============================================================ */
 export async function createImage(prompt: string | null = null) {
     try {
 
         if(!artModel){
+            //ignoring request if model is not defined
             console.error("ERROR: Art model not defined");
             return null;
         }
@@ -118,12 +130,13 @@ ${ART_ASSISTANT_CONTEXT}` ;
             model: artModel,
             prompt: improvedPrompt,
             n: 1,
-            size: "1024x1024",
+            size: IMAGE_SIZE,
             });
         console.log(`image: ${JSON.stringify(response.data[0])}`);
         
         return response.data[0];
     } catch (error) {
+        //returns null if there is an error and the caller defines the behavior
         console.error("createImage error: ", error);
         return null;
     }
@@ -133,8 +146,7 @@ ${ART_ASSISTANT_CONTEXT}` ;
 /* ============================================================
   Function: Download Image
 ============================================================ */
-
-export const download_image = async (url: string, image_path: string) =>{
+export const download_image = async (url: string, image_path: string, retry: number = 0) : Promise<void> =>{
     try {
         await axios({
             url,
@@ -156,5 +168,10 @@ export const download_image = async (url: string, image_path: string) =>{
           );
     } catch (error) {
         console.error("download_image error: ", error);
+        if(retry < 3){
+            //wait one second retry 3 times if there is an error
+            await sleep(1000);
+            return download_image(url, image_path, retry + 1);
+        }
     }
 }

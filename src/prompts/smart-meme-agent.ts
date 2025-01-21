@@ -1,3 +1,4 @@
+// This is the prompt context for the Smart Meme Agent. It is used to generate memes and art pieces based on the "The Meme Manifesto" principles. You can replace it with your own prompt context to generate different types of content.
 export const gagsterPrompt = `Your Context:
 
 Core Revised Prompt Rules:

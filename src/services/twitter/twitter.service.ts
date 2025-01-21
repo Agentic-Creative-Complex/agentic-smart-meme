@@ -5,6 +5,7 @@ dotenv.config();
 
 const TWITTER_PRODUCTION = process.env.TWITTER_PRODUCTION == "1";
 
+// Twitter API client
 export const twitterClient: any = new TwitterApi({
     appKey: process.env.TWITTER_API_KEY || '',
     appSecret: process.env.TWITTER_API_SECRET_KEY || '',
@@ -14,18 +15,24 @@ export const twitterClient: any = new TwitterApi({
 });
 
 const PROFILE_X_ID = process.env.PROFILE_X_ID || '';
+const MENTIONS_MAX_RESULTS = 100;
+const MENTIONS_TWITTER_FIELDS = 'created_at,author_id';
+const MENTIONS_USER_FIELDS = 'id,name,username,verified,verified_type';
+const GET_USER_FIELDS = 'username';
 
+// Fetch mentions for the authenticated user
 export async function getMentions(start_time: number){
     try {
         let startDateTime = new Date(Number(start_time));
         console.log(`Mentions since: ${start_time} = ${ startDateTime.toISOString() }`);
+        //Parse the date to ISO format for twitter API
         const date = startDateTime.toISOString().split('.')[0]+"Z";
         
         const mentionsResponse = await twitterClient.v2.userMentionTimeline(`${PROFILE_X_ID}`, {
-            max_results: 100, // You can set this to retrieve more mentions if needed, up to 100
+            max_results: MENTIONS_MAX_RESULTS, // You can set this to retrieve more mentions if needed, up to 100
             start_time: date,
-            'tweet.fields': 'created_at,author_id',
-            'user.fields': 'id,name,username,verified,verified_type'
+            'tweet.fields': MENTIONS_TWITTER_FIELDS,
+            'user.fields': MENTIONS_USER_FIELDS
         });
 
         if(mentionsResponse?.data?.data && mentionsResponse?.data?.data?.length > 0){
@@ -42,15 +49,17 @@ export async function getMentions(start_time: number){
             error_message: error?.message,
             error_stack: error?.stack
         })
+        //return empty array if there is an error and the caller defines the behavior
         return [];
     }
 }
 
+// Fetch users by user ids
 export async function findUsers(userIds: string[]) {
     try {
         console.log("Fetching users...");
         const usersResponse = await twitterClient.v2.users(userIds, {
-            'user.fields': 'username'
+            'user.fields': GET_USER_FIELDS
         });
 
         if (usersResponse.data && usersResponse.data.length > 0) {
@@ -66,10 +75,12 @@ export async function findUsers(userIds: string[]) {
             error_message: error?.message,
             error_stack: error?.stack
         })
+        //return empty array if there is an error and the caller defines the behavior
         return [];
     }
 }
 
+// Reply to a mention
 export async function replyToMention(mentionId: string, botMessage: string) {
     try {
 
@@ -95,10 +106,12 @@ export async function replyToMention(mentionId: string, botMessage: string) {
             error_message: error?.message,
             error_stack: error?.stack
         })
+        //return null if there is an error and the caller defines the behavior
         return null;
     }
 }
 
+// Tweet a message
 export async function tweet(message: string, image_url: string | null = null) {
     try {
 
@@ -133,10 +146,12 @@ export async function tweet(message: string, image_url: string | null = null) {
             error_message: error?.message,
             error_stack: error?.stack
         })
+        //return null if there is an error and the caller defines the behavior
         return null;
     }
 }
 
+// Fetch tweets for a user
 export async function getTweets(user_id: string, start_time: number){
     try {
 
@@ -163,6 +178,7 @@ export async function getTweets(user_id: string, start_time: number){
             error_message: error?.message,
             error_stack: error?.stack
           })
+          //return empty array if there is an error and the caller defines the behavior
         return [];
     }
 }

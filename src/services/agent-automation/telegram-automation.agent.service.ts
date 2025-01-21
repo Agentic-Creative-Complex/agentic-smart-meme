@@ -11,6 +11,7 @@ import { Activity, ActivityChannel, ActivityType } from "../../db/models/Activit
 dotenv.config();
 
 const BOT_USERNAME = process.env.TG_BOT_USERNAME!;
+const TG_SLEEP_TIME = 2000;
 
 export const checkTgUpdates = async (): Promise<void> => {
     try {
@@ -24,13 +25,15 @@ export const checkTgUpdates = async (): Promise<void> => {
         
         
     } catch (error) {
+        //ignore the error and continue to call from last point
         console.error(error);
     }
 
-    await sleep(2000);
+    await sleep(TG_SLEEP_TIME);
     await checkTgUpdates(); //recursive call to keep getting updates
 }
 
+//process telegram updates and take actions
 const handleTgUpdates = async (updates: TelegramUpdate[]): Promise<void> => {
     try {
         var lastUpdateId = 0;
@@ -204,7 +207,8 @@ const handleTgUpdates = async (updates: TelegramUpdate[]): Promise<void> => {
             await lastMessage.save();
         }
     } catch (error) {
+        //log error and continue processing the next messages
         console.error("handleTgUpdates error: ",error);
     }
-    
+    return;
 };

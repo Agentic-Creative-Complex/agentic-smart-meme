@@ -16,6 +16,7 @@ class TwitterMediaUploader {
 
   constructor() {}
 
+  // Upload media to Twitter
   async uploadMedia(filePath: string, mediaCategory: string) {
 
     try {
@@ -51,11 +52,13 @@ class TwitterMediaUploader {
       return mediaID;
     } catch (error) {
       console.error('uploadMedia error: ', error);
+      //return null if there is an error and the caller defines the behavior
       return null;
     }
   }
 }
 
+// Upload image to Twitter
 export async function uploadImageToTwitter(imageUrl: string) {
   try {
     const twitterUploader = new TwitterMediaUploader();
@@ -64,6 +67,7 @@ export async function uploadImageToTwitter(imageUrl: string) {
     return response;
   } catch (error) {
     console.error('uploadImageToTwitter error: ', error);
+    //return null if there is an error and the caller defines the behavior
     return null;
   }
   

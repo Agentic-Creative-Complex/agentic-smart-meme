@@ -30,21 +30,28 @@ import { TgChat } from "./db/models/TgChat";
 import { TgMessage } from "./db/models/TgMessage";
 import { Activity } from "./db/models/Activity";
 import { Artwork } from "./db/models/Artwork";
+import { rateLimitMiddleware } from "./middlewares/rateLimit";
 
 const app = express();
 
+//apply CORS middleware
 app.use(cors({
   origin: '*', // Allow all origins - customize this in production!
   methods: '*',
   allowedHeaders: '*',
 }));
 
+//apply json middleware
 app.use(express.json()); // Middleware for parsing JSON request bodies
+
+//apply ratelimit middleware
+app.use(rateLimitMiddleware); // Middleware for ratelimiting requests
 
 // Set up Swagger and generate API documentation
 const swaggerSpec = swaggerJsDoc(swaggerOptions) as any;
 swaggerSpec.paths = orderSwaggerPaths(swaggerSpec.paths);
 
+//mount static routes
 app.use('/api-images', express.static(__dirname + '/public'))
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Mount the routers
@@ -52,7 +59,7 @@ app.use('/api/status', healthRouter);
 app.use('/api/actions', actionsRouter);
 app.use('/api/data', dataRouter);
 
-// Use OpenAPI Validator to validate incoming requests and responses
+// Use OpenAPI Validator middleware to validate incoming requests and responses
 app.use(OpenApiValidator.middleware({
   apiSpec: swaggerSpec,
   validateRequests: false,
@@ -84,6 +91,7 @@ const sequelize = new Sequelize(
   }
 );
 
+//enabling sequelize models
 sequelize.addModels([
   User,
   Mention,
@@ -95,10 +103,10 @@ sequelize.addModels([
 
 setSequelizeInstance(sequelize);
 
+//starting server
 app.listen(CONSTANTS.EXPRESS_PORT, () => {
   console.log(`Smart Meme bot agent API server started on port ${CONSTANTS.EXPRESS_PORT}`);
 
-  const MENTION_CHECK_INTERVAL_MINUTES = Number(process.env.MENTION_CHECK_INTERVAL_MINUTES) || 6;
   const POST_INTERVAL_MINUTES = Number(process.env.POST_INTERVAL_MINUTES) || 30;
 
   // Run the function to fetch mentions
@@ -108,6 +116,7 @@ app.listen(CONSTANTS.EXPRESS_PORT, () => {
   const ART_ASSISTANT_ALLOWED = process.env.ART_ASSISTANT_ALLOWED == "1";//allows art assistant
 
   if(REPLY_ALLOWED){
+    //ingest twitter mentions and reply
     getAndReplyRecentMentions();
   }
   
@@ -127,7 +136,7 @@ app.listen(CONSTANTS.EXPRESS_PORT, () => {
   }
 
   if(TG_ALLOWED){
-    // // Run the function to fetch telegram updates
+    // Run the function to fetch telegram updates
     checkTgUpdates();
   }
   
